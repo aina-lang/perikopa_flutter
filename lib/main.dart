@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:perikopa_flutter/pages/Index.dart";
 import "package:perikopa_flutter/pages/SplashScreen.dart";
 
 void main() {

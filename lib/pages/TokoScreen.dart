@@ -43,7 +43,7 @@ class _TokoScreenState extends State<TokoScreen> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            backgroundColor: Color.fromRGBO(63, 81, 181, 1),
+            backgroundColor: const Color.fromRGBO(63, 81, 181, 1),
             foregroundColor: Colors.white,
             titleSpacing: -5,
             title: Row(
@@ -51,14 +51,14 @@ class _TokoScreenState extends State<TokoScreen> {
               children: [
                 Text(
                   widget.nomLivre,
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 ),
                 GestureDetector(
                   onTap: () {
                     // Navigate to the home screen
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   },
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.only(right: 20),
                     child: Icon(Icons.home),
                   ),
@@ -66,7 +66,7 @@ class _TokoScreenState extends State<TokoScreen> {
               ],
             ),
           ),
-          SliverAppBar(
+          const SliverAppBar(
             automaticallyImplyLeading: false,
             title: Text(
               "SAFIDIO NY TOKO",
@@ -77,7 +77,7 @@ class _TokoScreenState extends State<TokoScreen> {
             titleSpacing: 10,
           ),
           SliverPadding(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
@@ -104,13 +104,13 @@ class _TokoScreenState extends State<TokoScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Color.fromRGBO(63, 81, 181, 1)
+                            ? const Color.fromRGBO(63, 81, 181, 1)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0x9f9a9a).withOpacity(0.26),
-                            offset: Offset(0, 2),
+                            color: const Color(0x9f9a9a).withOpacity(0.26),
+                            offset: const Offset(0, 2),
                             blurRadius: 2,
                             spreadRadius: 1,
                           )
@@ -122,17 +122,16 @@ class _TokoScreenState extends State<TokoScreen> {
                           style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : Color.fromRGBO(63, 81, 181, 1)),
+                                  : const Color.fromRGBO(63, 81, 181, 1)),
                         ),
                       ),
                     ),
                   );
                 },
-                childCount: tokoList.length - 1,
+                childCount: tokoList.length ,
               ),
             ),
           ),
-         
         ],
       ),
     );

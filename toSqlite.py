@@ -2,7 +2,6 @@ import sqlite3
 import json
 
 # Fonction pour créer les tables dans la base de données SQLite
-
 def reset_tables(cursor):
     cursor.execute('''
         DELETE FROM andininys;
@@ -54,8 +53,40 @@ def create_tables(cursor):
             FOREIGN KEY (idToko) REFERENCES tokos (id)
         )
     ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS livres_info (
+            id INTEGER PRIMARY KEY,
+            idBook INTEGER,
+            code VARCHAR(10),
+            name VARCHAR(50) NOT NULL,
+            ordre INTEGER NOT NULL,
+            FOREIGN KEY (idBook) REFERENCES books (id)
+        )
+    ''')
 
-# Fonction pour insérer des données dans les tables
+def read_livres_info_from_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+def insert_livres_info(cursor, livres_info):
+    for code, info in livres_info.items():
+        print(info)
+        cursor.execute('''
+            SELECT id FROM books WHERE shortName = ?
+        ''', (code,))
+
+        book_row = cursor.fetchone()
+
+        # Si le livre correspondant est trouvé, insérer les informations dans la table livres_info
+        # if book_row:
+        #     book_id = book_row[0]
+            
+        #     cursor.execute('''
+        #         INSERT INTO livres_info (idBook, code, name, ordre)
+        #         VALUES (?, ?, ?, ?)
+        #     ''', (book_id, code, info['name'], info['order']))
+
 def insert_data(cursor, data):
     for item in data["body"]:
         # Insérer des données dans la table 'books'
@@ -82,7 +113,6 @@ def insert_data(cursor, data):
 
                 # Insérer des données dans la table 'andininys'
                 texts_value = item["books"].get("texts", [])
-                print(item["books"]["toko"])
                 for text in texts_value:
                     cursor.execute('''
                         INSERT INTO andininys (idToko, numeroToko, text)
@@ -110,9 +140,7 @@ def insert_data(cursor, data):
                             VALUES (?, ?, ?)
                         ''', (toko_id, item["books"][i].get("toko", 0), text))
 
-# Fonction principale
 def main():
-   
     # Charger les données JSON à partir d'un fichier
     with open('A:\\baiboly.json', 'r', encoding='utf-8') as file:
         json_data = json.load(file)
@@ -120,12 +148,18 @@ def main():
     # Connexion à la base de données SQLite
     conn = sqlite3.connect(r'A:\PROJECTS\Mobile\perikopa_flutter\assets\perikopa.db')
     cursor = conn.cursor()
-    reset_tables(cursor)
+    # reset_tables(cursor)
     # Créer les tables dans la base de données
-    create_tables(cursor)
+    # create_tables(cursor)
 
     # Insérer les données dans les tables
-    insert_data(cursor, json_data)
+    # insert_data(cursor, json_data)
+
+    # Charger les informations sur les livres depuis un autre fichier JSON
+    livres_info = read_livres_info_from_file('A:\\mapBoky.json')
+
+    # Insérer les informations sur les livres dans la table livres_info
+    insert_livres_info(cursor, livres_info)
 
     # Valider les modifications et fermer la connexion
     conn.commit()

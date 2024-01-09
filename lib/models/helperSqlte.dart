@@ -35,9 +35,16 @@ class DBHelper {
   static Future<List<Book>?> getAllBook() async {
     final db = await getDB();
 
-    final List<Map<String, dynamic>> maps = await db.query('Livre');
+    final List<Map<String, dynamic>> maps = await db.query('livres_info');
+
     return List.generate(maps.length, (index) {
-      return Book.fromMap(maps[index]);
+      return Book(
+        id: maps[index]['id'],
+        code: maps[index]['code'],
+        idBook: maps[index]['idBook'],
+        order: maps[index]['ordre'],
+        name: maps[index]['name'],
+      );
     });
   }
 
@@ -46,8 +53,8 @@ class DBHelper {
       final db = await getDB();
 
       List<Map<String, dynamic>> result = await db.rawQuery('''
-      SELECT textAndininy
-      FROM andininy
+      SELECT text
+      FROM andininys
       WHERE idToko = ?
     ''', [toko]);
 
@@ -55,9 +62,9 @@ class DBHelper {
       print(result);
       // Extract andininy texts from the result
       List<String> andininyTexts =
-          result.map((row) => row['textAndininy'] as String).toList();
+          result.map((row) => row['text'] as String).toList();
 
-      print(andininyTexts);
+      // print(andininyTexts);
       return andininyTexts;
     } catch (e) {
       print("Error fetching andininy: $e");
@@ -65,21 +72,21 @@ class DBHelper {
     }
   }
 
-  static Future<int> getTokoValue(String nomLivre,int numero) async {
+  static Future<int> getTokoValue(String nomLivre, int numero) async {
     try {
       final db = await getDB();
 
       int livreId = Sqflite.firstIntValue(await db.rawQuery('''
       SELECT id
-      FROM Livre
-      WHERE nom = ?
+      FROM books
+      WHERE shortName = ?
     ''', [nomLivre])) ?? 0;
 
       List<Map<String, Object?>> tokoIdResult = await db.rawQuery('''
       SELECT id
-      FROM toko
-      WHERE idLivre = ?  AND numero= ? 
-    ''', [livreId,numero]);
+      FROM tokos
+      WHERE book_id = ?  AND numero= ? 
+    ''', [livreId, numero]);
 
       if (tokoIdResult.isEmpty) {
         return 0;
@@ -101,8 +108,8 @@ class DBHelper {
 
       List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT DISTINCT numero
-      FROM toko
-      WHERE idLivre = (SELECT id FROM Livre WHERE nom = ?)
+      FROM tokos
+      WHERE book_id = (SELECT id FROM books WHERE shortName = ?)
     ''', [nomLivre]);
 
       await db.close();
@@ -124,14 +131,14 @@ class DBHelper {
 
       int livreId = Sqflite.firstIntValue(await db.rawQuery('''
       SELECT id
-      FROM Livre
-      WHERE nom = ?
+      FROM books
+      WHERE shortName = ?
     ''', [nomLivre])) ?? 0;
 
       List<Map<String, Object?>> tokoIdResult = await db.rawQuery('''
       SELECT id
-      FROM toko
-      WHERE idLivre = ?  AND numero = ?
+      FROM tokos
+      WHERE book_id = ?  AND numero = ?
     ''', [livreId, numeroToko]);
 
       if (tokoIdResult.isEmpty) {
@@ -143,8 +150,8 @@ class DBHelper {
       print("TOKO ID: $tokoId");
 
       List<Map<String, Object?>> result = await db.rawQuery('''
-      SELECT numero
-      FROM andininy
+      SELECT id
+      FROM andininys
       WHERE idToko = ? 
     ''', [tokoId]);
 
@@ -158,6 +165,50 @@ class DBHelper {
     } catch (e) {
       print("Error fetching distinctNumeroAndininy: $e");
       return [];
+    }
+  }
+
+  static Future<int> getAndininyCountForToko(
+      String nomLivre, String numeroToko) async {
+    try {
+      final db = await getDB();
+
+      int livreId = Sqflite.firstIntValue(await db.rawQuery('''
+      SELECT id
+      FROM books
+      WHERE shortName = ?
+    ''', [nomLivre])) ?? 0;
+
+      List<Map<String, Object?>> tokoIdResult = await db.rawQuery('''
+      SELECT id
+      FROM tokos
+      WHERE book_id = ? AND numero = ?
+    ''', [livreId, numeroToko]);
+
+      if (tokoIdResult.isEmpty) {
+        return 0;
+      }
+
+      int tokoId = tokoIdResult.first['id'] as int;
+      print("Livre ID: $livreId");
+      print("TOKO ID: $tokoId");
+
+      List<Map<String, Object?>> result = await db.rawQuery('''
+      SELECT COUNT(*) as count
+      FROM andininys
+      WHERE idToko = ?
+    ''', [tokoId]);
+
+      await db.close();
+      // print(result);
+
+      int count = result.first['count'] as int;
+
+      print(count);
+      return count;
+    } catch (e) {
+      print("Error fetching andininy count for toko: $e");
+      return 0;
     }
   }
 }

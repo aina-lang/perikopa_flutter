@@ -20,29 +20,21 @@ class _AllBookScreenState extends State<AllBookScreen> {
     fetchData();
   }
 
-  Future<void> fetchData() async {
-    var bookList = await DBHelper.getAllBook();
-    if (bookList != null) {
-      List<Book> filteredBooks =
-          bookList!.where((book) => book.idTestament == 1).toList();
-      setState(() {
-        books = filteredBooks;
-      });
-      // for (var book in filteredBooks) {
-      //   print(book.nom);
-      // }
-    }
+  void fetchData() async {
+    List<Book>? bookList = await DBHelper.getAllBook();
+
+    print("LIST BOOK ${bookList!.length}");
+    setState(() {
+      books = bookList;
+    });
   }
 
-// Appelez fetchData depuis une fonction asynchrone
-
+//  late SwiperController _swiperController;
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    // fetchData();
 
-    // print(books);
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F9),
       body: CustomScrollView(
@@ -80,7 +72,7 @@ class _AllBookScreenState extends State<AllBookScreen> {
           SliverPadding(padding: EdgeInsets.all(10)),
           const SliverAppBar(
             // actions: null,
-            pinned: true,
+            pinned:false,
             backgroundColor: Color(0xFFF5F6F9),
             foregroundColor: Color.fromARGB(255, 78, 77, 77),
             automaticallyImplyLeading: false,
@@ -112,15 +104,15 @@ class _AllBookScreenState extends State<AllBookScreen> {
                       // Handle the case where there are no books
                       return Text('');
                     } else {
-                      // Filter books where idTestament == 1
-                      List<Book> filteredBooks = snapshot.data!
-                          .where((book) => book.idTestament == 1)
-                          .toList();
+                      // Filter books where id == 1
+                      // List<Book> filteredBooks = snapshot.data!
+                      //     .where((book) => book.id == 1)
+                      //     .toList();
 
                       // Ensure the index is within the valid range
-                      if (index >= 0 && index < filteredBooks.length) {
+                      if (index >= 0 && index < books!.length) {
                         // Build the SliverChildBuilderDelegate using the filtered book data
-                        Book book = filteredBooks[index];
+                        Book book = books![index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 5),
@@ -137,7 +129,7 @@ class _AllBookScreenState extends State<AllBookScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => TokoScreen(
-                                            nomLivre: book.nom,
+                                            nomLivre: book.code,
                                           )),
                                 );
                                 setState(() {
@@ -153,7 +145,8 @@ class _AllBookScreenState extends State<AllBookScreen> {
                               },
                               style: ButtonStyle(
                                 backgroundColor: boutonClique[index]
-                                    ? MaterialStateProperty.all(Color.fromRGBO(63, 81, 181, 1))
+                                    ? MaterialStateProperty.all(
+                                        Color.fromRGBO(63, 81, 181, 1))
                                     : MaterialStateProperty.all(Colors.white),
                                 foregroundColor: boutonClique[index]
                                     ? MaterialStateProperty.all(Colors.white)
@@ -167,7 +160,8 @@ class _AllBookScreenState extends State<AllBookScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(book.nom ?? ''), // Handle nullable 'nom'
+                                  Text(book.name ??
+                                      ''), // Handle nullable 'shortName'
                                   Icon(Icons.navigate_next_outlined)
                                 ],
                               ),
@@ -182,116 +176,117 @@ class _AllBookScreenState extends State<AllBookScreen> {
                   },
                 );
               },
-              childCount: 42,
+              childCount: books!.length,
             ),
           ),
 
-          const SliverAppBar(
-            // actions: null,
-            pinned: true,
-            backgroundColor: Color(0xFFF5F6F9),
-            foregroundColor: Color.fromARGB(255, 78, 77, 77),
-            automaticallyImplyLeading: false,
-            // forceMaterialTransparency: Color.fromARGB(255, 220, 229, 250),
-            title: SizedBox(
-              height: 40,
-              // color: Colors.amber,
-              child: Text(
-                "TESTAMENTA VAOVAO",
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, index) {
-                return FutureBuilder<List<Book>?>(
-                  future: DBHelper.getAllBook(),
-                  builder: (context, snapshot) {
-                    // if (snapshot.connectionState == ConnectionState.waiting) {
-                    //   // Return a loading indicator or placeholder widget
-                    //   return const CircularProgressIndicator();
-                    // } else if (snapshot.hasError) {
-                    //   // Handle the error
-                    //   return Text('Error: ${snapshot.error}');
-                    // } else
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      // Handle the case where there are no books
-                      return Text('');
-                    } else {
-                      // Filter books where idTestament == 1
-                      List<Book> filteredBooks = snapshot.data!
-                          .where((book) => book.idTestament == 2)
-                          .toList();
+          // const SliverAppBar(
+          //   // actions: null,
+          //   pinned: true,
+          //   backgroundColor: Color(0xFFF5F6F9),
+          //   foregroundColor: Color.fromARGB(255, 78, 77, 77),
+          //   automaticallyImplyLeading: false,
+          //   // forceMaterialTransparency: Color.fromARGB(255, 220, 229, 250),
+          //   title: SizedBox(
+          //     height: 40,
+          //     // color: Colors.amber,
+          //     child: Text(
+          //       "TESTAMENTA VAOVAO",
+          //       style: TextStyle(fontSize: 15),
+          //     ),
+          //   ),
+          // ),
+          // SliverList(
+          //   delegate: SliverChildBuilderDelegate(
+          //     (BuildContext context, index) {
+          //       return FutureBuilder<List<Book>?>(
+          //         future: DBHelper.getAllBook(),
+          //         builder: (context, snapshot) {
+          //           // if (snapshot.connectionState == ConnectionState.waiting) {
+          //           //   // Return a loading indicator or placeholder widget
+          //           //   return const CircularProgressIndicator();
+          //           // } else if (snapshot.hasError) {
+          //           //   // Handle the error
+          //           //   return Text('Error: ${snapshot.error}');
+          //           // } else
+          //           if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          //             // Handle the case where there are no books
+          //             return Text('');
+          //           } else {
+          //             // Filter books where id == 1
+          //             List<Book> filteredBooks =
+          //                 snapshot.data!.where((book) => book.id == 2).toList();
 
-                      // Ensure the index is within the valid range
-                      if (index >= 0 && index < filteredBooks.length) {
-                        // Build the SliverChildBuilderDelegate using the filtered book data
-                        Book book = filteredBooks[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: boutonClique[index]
-                                  ? Color.fromRGBO(63, 81, 181, 1)
-                                  : Colors.white,
-                            ),
-                            child: FilledButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => TokoScreen(
-                                            nomLivre: book.nom,
-                                          )),
-                                );
-                                setState(() {
-                                  boutonClique[index] = !boutonClique[index];
-                                  for (int i = 0;
-                                      i < boutonClique.length;
-                                      i++) {
-                                    if (i != index) {
-                                      boutonClique[i] = false;
-                                    }
-                                  }
-                                });
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: boutonClique[index]
-                                    ? MaterialStateProperty.all(Color.fromRGBO(63, 81, 181, 1))
-                                    : MaterialStateProperty.all(Colors.white),
-                                foregroundColor: boutonClique[index]
-                                    ? MaterialStateProperty.all(Colors.white)
-                                    : MaterialStateProperty.all(Colors.grey),
-                                padding: MaterialStateProperty.all(
-                                  const EdgeInsets.only(
-                                      top: 15, bottom: 15, left: 20, right: 5),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(book.nom ?? ''), // Handle nullable 'nom'
-                                  Icon(Icons.navigate_next_outlined)
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      } else {
-                        // Handle the case where the index is out of range
-                        return SizedBox.shrink();
-                      }
-                    }
-                  },
-                );
-              },
-              childCount: 42,
-            ),
-          ),
+          //             // Ensure the index is within the valid range
+          //             if (index >= 0 && index < filteredBooks.length) {
+          //               // Build the SliverChildBuilderDelegate using the filtered book data
+          //               Book book = filteredBooks[index];
+          //               return Padding(
+          //                 padding: const EdgeInsets.symmetric(
+          //                     horizontal: 15, vertical: 5),
+          //                 child: Container(
+          //                   decoration: BoxDecoration(
+          //                     borderRadius: BorderRadius.circular(15),
+          //                     color: boutonClique[index]
+          //                         ? Color.fromRGBO(63, 81, 181, 1)
+          //                         : Colors.white,
+          //                   ),
+          //                   child: FilledButton(
+          //                     onPressed: () {
+          //                       Navigator.push(
+          //                         context,
+          //                         MaterialPageRoute(
+          //                             builder: (context) => TokoScreen(
+          //                                   nomLivre: book.code,
+          //                                 )),
+          //                       );
+          //                       setState(() {
+          //                         boutonClique[index] = !boutonClique[index];
+          //                         for (int i = 0;
+          //                             i < boutonClique.length;
+          //                             i++) {
+          //                           if (i != index) {
+          //                             boutonClique[i] = false;
+          //                           }
+          //                         }
+          //                       });
+          //                     },
+          //                     style: ButtonStyle(
+          //                       backgroundColor: boutonClique[index]
+          //                           ? MaterialStateProperty.all(
+          //                               Color.fromRGBO(63, 81, 181, 1))
+          //                           : MaterialStateProperty.all(Colors.white),
+          //                       foregroundColor: boutonClique[index]
+          //                           ? MaterialStateProperty.all(Colors.white)
+          //                           : MaterialStateProperty.all(Colors.grey),
+          //                       padding: MaterialStateProperty.all(
+          //                         const EdgeInsets.only(
+          //                             top: 15, bottom: 15, left: 20, right: 5),
+          //                       ),
+          //                     ),
+          //                     child: Row(
+          //                       mainAxisAlignment:
+          //                           MainAxisAlignment.spaceBetween,
+          //                       children: [
+          //                         Text(book.code ??
+          //                             ''), // Handle nullable 'shortName'
+          //                         Icon(Icons.navigate_next_outlined)
+          //                       ],
+          //                     ),
+          //                   ),
+          //                 ),
+          //               );
+          //             } else {
+          //               // Handle the case where the index is out of range
+          //               return SizedBox.shrink();
+          //             }
+          //           }
+          //         },
+          //       );
+          //     },
+          //     childCount: 42,
+          //   ),
+          // ),
         ],
       ),
     );

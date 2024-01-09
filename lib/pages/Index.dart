@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, file_names, prefer_const_literals_to_create_immutables, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:perikopa_flutter/models/Book.dart';
+import 'package:perikopa_flutter/models/helperSqlte.dart';
 import 'package:perikopa_flutter/pages/AllBookScreen.dart';
 import 'package:perikopa_flutter/pages/AproposScreen.dart';
 import 'package:perikopa_flutter/pages/HomeScreen.dart';
@@ -16,9 +18,14 @@ class _IndexState extends State<Index> {
 
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen = HomeScreen();
+  void printToko() async {
+    // List toko=DBHelper.getTokoValue(widget, numero)
+  }
 
   @override
   Widget build(BuildContext context) {
+    printToko();
+
     return Scaffold(
       body: PageStorage(
         bucket: bucket,
@@ -35,7 +42,6 @@ class _IndexState extends State<Index> {
         foregroundColor: Colors.white,
         shape: CircleBorder(),
         child: Icon(Icons.menu_book_sharp),
-        
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -43,9 +49,7 @@ class _IndexState extends State<Index> {
         color: const Color.fromARGB(255, 255, 255, 255),
         shape: CircularNotchedRectangle(),
         shadowColor: Colors.grey,
-      
         notchMargin: 10,
-        
         child: SizedBox(
           // color: Colors.amber,
           height: 40,
@@ -62,7 +66,9 @@ class _IndexState extends State<Index> {
                           _currentIndex = 0;
                         });
                       },
-                      textColor: _currentIndex == 0 ? Color.fromRGBO(63, 81, 181, 1): Colors.grey,
+                      textColor: _currentIndex == 0
+                          ? Color.fromRGBO(63, 81, 181, 1)
+                          : Colors.grey,
                       child:
                           Column(children: [Icon(Icons.home), Text("Accueil")]),
                     ),
@@ -78,7 +84,9 @@ class _IndexState extends State<Index> {
                           _currentIndex = 1;
                         });
                       },
-                      textColor: _currentIndex == 1 ? Color.fromRGBO(63, 81, 181, 1): Colors.grey,
+                      textColor: _currentIndex == 1
+                          ? Color.fromRGBO(63, 81, 181, 1)
+                          : Colors.grey,
                       child:
                           Column(children: [Icon(Icons.info), Text("Apropos")]),
                     ),

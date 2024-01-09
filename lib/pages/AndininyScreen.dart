@@ -15,22 +15,22 @@ class AndininyScreen extends StatefulWidget {
 }
 
 class _AndininyScreenState extends State<AndininyScreen> {
-  List<int> AndininyList = [];
+  int? andininyCount ;
 
   int selectedButtonIndex = 0; // Track the selected button index
 
   @override
   void initState() {
     super.initState();
-    fetchAndininyList(widget.nomLivre);
+    fetchandininyCount(widget.nomLivre);
   }
 
-  Future<void> fetchAndininyList(String nomLivre) async {
-    List<int> distinctAndinnyValues =
-        await DBHelper.getDistinctNumeroAndininy(widget.nomLivre, widget.toko);
+  Future<void> fetchandininyCount(String nomLivre) async {
+    int distinctAndinnyValues = await DBHelper.getAndininyCountForToko(
+        widget.nomLivre, widget.toko);
 
     setState(() {
-      AndininyList = distinctAndinnyValues;
+      andininyCount = distinctAndinnyValues;
     });
   }
 
@@ -96,7 +96,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
                             builder: (context) => SHowVerse(
                                   nomLivre: widget.nomLivre,
                                   toko: widget.toko,
-                                  andininy: AndininyList[index].toString(),
+                                  andininy: (index+1).toString(),
                                 )),
                       );
                       setState(() {
@@ -120,7 +120,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          AndininyList[index].toString(),
+                          (index+1).toString(),
                           style: TextStyle(
                               color: isSelected
                                   ? Colors.white
@@ -130,7 +130,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
                     ),
                   );
                 },
-                childCount: AndininyList.length,
+                childCount: andininyCount,
               ),
             ),
           ),
