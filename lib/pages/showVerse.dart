@@ -167,8 +167,9 @@ class _SHowVerseState extends State<SHowVerse> {
         onPressed: () {
           _showPersistentBottomSheet();
         },
-        child: Icon(Icons.add),
+        child:const Icon(Icons.add),
       ),
+    
     );
   }
 
