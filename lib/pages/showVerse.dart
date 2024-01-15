@@ -49,6 +49,7 @@ class _SHowVerseState extends State<SHowVerse> {
     currentPage = tokoAsInt;
     currentIndex = 0;
     Code = widget.nomLivre;
+
     fetchAndininyText(widget.nomLivre);
   }
 
@@ -71,10 +72,12 @@ class _SHowVerseState extends State<SHowVerse> {
   }
 
   void fetchAndininyText(String nom) async {
+    double? zoom = await Preference().getZoom() ?? 1.0;
+    zoomLevel = zoom;
     itemCount = await DBHelper.getCountForBook(nom);
     int tokoId = await DBHelper.getTokoValue(nom, currentPage);
     titleLivre = await DBHelper.getNomLivre(nom);
-    if (currentPage < itemCount+1 ) {
+    if (currentPage < itemCount + 1) {
       print(
           "1 BOKY ${titleLivre} TOTAL TOKO :${itemCount} CURRENT INDEX :${currentIndex}");
       List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
@@ -183,9 +186,9 @@ class _SHowVerseState extends State<SHowVerse> {
             print(
                 "INDEX ${index} CURRENTPAGE ${currentPage} CURRENT INDEX ${currentIndex}");
             setState(() {
-              if (index == currentIndex + 1 ) {
+              if (index == currentIndex + 1) {
                 currentPage = (currentPage + 1);
-              } else if (index != currentIndex + 1 ) {
+              } else if (index != currentIndex + 1) {
                 currentPage = (currentPage - 1);
               }
               currentIndex = index;
@@ -465,9 +468,9 @@ class _SHowVerseState extends State<SHowVerse> {
             activeColor: Colors.blue,
             value: zoomLevel,
             onChanged: (value) {
+              Preference().setZoom(value);
               setState(() {
                 zoomLevel = value;
-                // Mettez à jour le zoom du texte ici
               });
             },
             min: 1.0,
