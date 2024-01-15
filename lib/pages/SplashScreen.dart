@@ -67,6 +67,8 @@ class _SplashScreenState extends State<SplashScreen> {
       print("IS FIRSTIME 2: ${firstTime}");
       DBInit._initializeDB();
       prefs.setBool('first_time', false);
+
+      prefs.setBool('isDarkMode', false);
       return Timer(_duration, navigationPageHome);
     }
   }
@@ -98,7 +100,9 @@ class _SplashScreenState extends State<SplashScreen> {
             // ),
             FadeAnimatedTextKit(
               repeatForever: true,
-              text: const ["Perikopa",],
+              text: const [
+                "Perikopa",
+              ],
               textAlign: TextAlign.center,
               textStyle: const TextStyle(
                 fontSize: 30.0,

@@ -17,10 +17,10 @@ class _AproposScreenState extends State<AproposScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 200.0,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
             pinned: true,
             stretch: true,
-            backgroundColor: Color.fromRGBO(63, 81, 181, 1),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.all(0),
               stretchModes: const [StretchMode.zoomBackground],
@@ -35,7 +35,7 @@ class _AproposScreenState extends State<AproposScreen> {
                 ),
               ),
               background: Image.asset(
-                'assets/images/girl.jpg',
+                'assets/images/adult.jpg',
                 fit: BoxFit.cover,
               ),
             ),

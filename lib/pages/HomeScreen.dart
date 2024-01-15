@@ -20,68 +20,69 @@ class _HomeScreenState extends State<HomeScreen> {
     MonthInfo(
       name: 'Janvier',
       description: 'Ceci est janvier. C\'est le premier mois de l\'année.',
-      imageUrl: 'assets/images/girl.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Février',
       description: 'Ceci est février. C\'est le deuxième mois de l\'année.',
-      imageUrl: 'assets/images/lucien.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Mars',
       description: 'Ceci est mars. C\'est le troisième mois de l\'année.',
-      imageUrl: 'assets/images/aina.png',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Avril',
       description: 'Ceci est avril. C\'est le quatrième mois de l\'année.',
-      imageUrl: 'assets/images/girl.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Mai',
       description: 'Ceci est mai. C\'est le cinquième mois de l\'année.',
-      imageUrl: 'assets/images/lucien.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Juin',
       description: 'Ceci est juin. C\'est le sixième mois de l\'année.',
-      imageUrl: 'assets/images/aina.png',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Juillet',
       description: 'Ceci est juillet. C\'est le septième mois de l\'année.',
-      imageUrl: 'assets/images/jesus.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Août',
       description: 'Ceci est août. C\'est le huitième mois de l\'année.',
-      imageUrl: 'assets/images/lucien.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Septembre',
       description: 'Ceci est septembre. C\'est le neuvième mois de l\'année.',
-      imageUrl: 'assets/images/aina.png',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Octobre',
       description: 'Ceci est octobre. C\'est le dixième mois de l\'année.',
-      imageUrl: 'assets/images/girl.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Novembre',
       description: 'Ceci est novembre. C\'est le onzième mois de l\'année.',
-      imageUrl: 'assets/images/girl.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
     MonthInfo(
       name: 'Décembre',
       description: 'Ceci est décembre. C\'est le douzième mois de l\'année.',
-      imageUrl: 'assets/images/girl.jpg',
+      imageUrl: 'assets/images/adult.jpg',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -97,21 +98,25 @@ class _HomeScreenState extends State<HomeScreen> {
               [
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20),
-                  color: Colors.white,
+                  // color: Theme.of(context).colorScheme.background,
+                  // decoration: BoxDecoration(color: Color.fromARGB(255, 235, 239, 241)),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children:  [
+                      children: [
                         Container(
-                          padding: EdgeInsets.only(left:20,bottom: 5),
-                          child: Text("Ity herinandro ity",style: TextStyle(color: Colors.grey),),
+                          padding: EdgeInsets.only(left: 20, bottom: 5),
+                          child: Text(
+                            "Ity herinandro ity",
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                         HomeVerse()
                       ]),
                 ),
                 CarouselSlider(
                   options: CarouselOptions(
-                    height: 170.0,
+                    height: 200.0,
                     enlargeCenterPage: true,
                     autoPlay: true,
                   ),
@@ -128,10 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           child: Container(
+                            // padding: EdgeInsets.symmetric(vertical: 10),
                             width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 10),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
+                              boxShadow: [BoxShadow(color: Color.fromARGB(192, 95, 94, 94),blurRadius: 2,offset: Offset(1,1),spreadRadius: 0.5)]
                             ),
                             child: Stack(
                               alignment: Alignment.center,

@@ -15,7 +15,7 @@ class TokoScreen extends StatefulWidget {
 
 class _TokoScreenState extends State<TokoScreen> {
   List<String> tokoList = [];
-
+  late String titleLivre = '';
   int selectedButtonIndex = 0;
 
   @override
@@ -27,7 +27,7 @@ class _TokoScreenState extends State<TokoScreen> {
   void fetchTokoList(String nomLivre) async {
     List<String> distinctTokoValues =
         await DBHelper.getDistinctTokoValues(widget.nomLivre);
-
+    titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
     setState(() {
       tokoList = distinctTokoValues;
     });
@@ -43,14 +43,14 @@ class _TokoScreenState extends State<TokoScreen> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            backgroundColor: const Color.fromRGBO(63, 81, 181, 1),
+            backgroundColor:  Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
             titleSpacing: -5,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.nomLivre,
+                 titleLivre,
                   style: const TextStyle(fontSize: 18),
                 ),
                 GestureDetector(
@@ -104,7 +104,7 @@ class _TokoScreenState extends State<TokoScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color.fromRGBO(63, 81, 181, 1)
+                            ? Theme.of(context).colorScheme.primary
                             : Colors.white,
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
@@ -122,13 +122,13 @@ class _TokoScreenState extends State<TokoScreen> {
                           style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : const Color.fromRGBO(63, 81, 181, 1)),
+                                  :  Theme.of(context).colorScheme.primary),
                         ),
                       ),
                     ),
                   );
                 },
-                childCount: tokoList.length ,
+                childCount: tokoList.length,
               ),
             ),
           ),

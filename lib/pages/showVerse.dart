@@ -1,11 +1,16 @@
-// ignore: file_names
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
+import 'package:focused_menu_custom/focused_menu.dart';
+import 'package:focused_menu_custom/modals.dart';
 import 'package:gesture_zoom_box/gesture_zoom_box.dart';
+import 'package:perikopa_flutter/config/AppStyle.dart';
+import 'package:perikopa_flutter/config/ThemeProvider.dart';
 import 'package:perikopa_flutter/models/helperSqlte.dart';
 import 'package:perikopa_flutter/pages/AllBookScreen.dart';
 import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SHowVerse extends StatefulWidget {
   final String toko;
@@ -27,56 +32,92 @@ class _SHowVerseState extends State<SHowVerse> {
   late int currentPage;
   late List<String?> andininyTexts = [];
   late String soramandry = '';
-  bool isLightMode = true;
+  late Color themBg = Colors.white;
+  bool isLightMode = false;
   double zoomLevel = 1.0;
-
+  late String titleLivre = "";
   late ScrollController _scrollController;
-
+  late int currentIndex;
+  late int itemCount = 0;
+  late String pressedAndininy = "";
+  late String Code = "";
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    fetchAndininyText();
-  }
-
-  void fetchAndininyText() async {
     int tokoAsInt = int.tryParse(widget.toko) ?? 0;
     currentPage = tokoAsInt;
-    int tokoId = await DBHelper.getTokoValue(widget.nomLivre, tokoAsInt);
-    print("TOKO ID VENANT D'ici: $tokoId");
-    List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
+    currentIndex = 0;
+    Code = widget.nomLivre;
+    fetchAndininyText(widget.nomLivre);
+  }
 
-    // Stocker le texte entre crochets dans la variable soramandry
-    soramandry = extractTextBetweenBrackets(andininyResult.first);
+  void fetchItem() async {
+    itemCount = await DBHelper.getCountForBook(widget.nomLivre);
+  }
 
-    // Filtrer le texte pour l'affichage
+  bool isDarkMode = false;
+
+  void loadTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      andininyTexts = andininyResult
-          .map((text) => _filterTextBetweenBrackets(text))
-          .toList();
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
     });
+  }
+
+  void saveTheme(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isDarkMode', value);
+  }
+
+  void fetchAndininyText(String nom) async {
+    itemCount = await DBHelper.getCountForBook(nom);
+    int tokoId = await DBHelper.getTokoValue(nom, currentPage);
+    titleLivre = await DBHelper.getNomLivre(nom);
+    if (currentPage < itemCount+1 ) {
+      print(
+          "1 BOKY ${titleLivre} TOTAL TOKO :${itemCount} CURRENT INDEX :${currentIndex}");
+      List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
+
+      setState(() {
+        soramandry = extractTextBetweenBrackets(andininyResult.first);
+        andininyTexts = andininyResult
+            .map((text) => _filterTextBetweenBrackets(text))
+            .toList();
+      });
+    } else {
+      // currentIndex = 0;
+      currentPage = 1;
+      String? nomLivre = await DBHelper.getNextBook(nom);
+      int tokoId = await DBHelper.getTokoValue(nomLivre!, currentPage);
+      List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
+      soramandry = extractTextBetweenBrackets(andininyResult.first);
+      titleLivre = await DBHelper.getNomLivre(nomLivre);
+      itemCount = await DBHelper.getCountForBook(nomLivre);
+      print(
+          "2 BOKY ${titleLivre} TOTAL TOKO :${itemCount} CURRENT INDEX :${currentIndex}");
+      setState(() {
+        andininyTexts = andininyResult
+            .map((text) => _filterTextBetweenBrackets(text))
+            .toList();
+        Code = nomLivre;
+      });
+    }
+
     _scrollController = ScrollController();
 
+    // print(int.parse(widget.andininy));
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      scrollToPosition(); // Appelé après le premier rendu de la frame
+      scrollToPosition(int.parse(widget.andininy));
     });
   }
 
-  void _scrollToSpecificElement() {
-    int indexToScroll = int.parse(widget.andininy);
-
-    double positionToScroll = indexToScroll * 62;
-
-    print("scrolling");
-    _scrollController.jumpTo(positionToScroll);
-  }
-
-  void scrollToPosition() {
-    int indexToScroll = int.parse(widget.andininy);
+  void scrollToPosition(int i) {
+    int indexToScroll = i;
 
     double positionToScroll = indexToScroll * 65;
 
-    // Assurez-vous que le contrôleur de défilement est attaché à votre CustomScrollView
+    // print("scrolling");
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(positionToScroll);
     }
@@ -103,15 +144,18 @@ class _SHowVerseState extends State<SHowVerse> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(63, 81, 181, 1),
+        elevation: 10,
+        shadowColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         titleSpacing: -5,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${widget.nomLivre} ${widget.toko} : $currentPage ",
+              "${titleLivre} $currentPage ",
               style: const TextStyle(fontSize: 18),
             ),
             Row(
@@ -133,74 +177,52 @@ class _SHowVerseState extends State<SHowVerse> {
         ),
       ),
       body: Swiper(
-          itemCount: 50,
-          // layout: SwiperLayout.CUSTOM,
-          // customLayoutOption: CustomLayoutOption(startIndex: -1, stateCount: 3)
-          //   ..addRotate([-45.0 / 180, 0.0, 45.0 / 180])
-          //   ..addTranslate([
-          //     const Offset(-370.0, -40.0),
-          //     const Offset(0.0, 0.0),
-          //     const Offset(370.0, -40.0)
-          //   ]),
-    
-          onIndexChanged: (int index) {
-            // Mettez à jour widget.toko en fonction de l'index
+          itemCount: 66,
+          // index: 0,
+          onIndexChanged: (index) {
+            print(
+                "INDEX ${index} CURRENTPAGE ${currentPage} CURRENT INDEX ${currentIndex}");
             setState(() {
-              currentPage = (index + 1);
+              if (index == currentIndex + 1 ) {
+                currentPage = (currentPage + 1);
+              } else if (index != currentIndex + 1 ) {
+                currentPage = (currentPage - 1);
+              }
+              currentIndex = index;
             });
-            fetchAndininyText();
+            fetchAndininyText(Code);
+            print(
+                "INDEX ${index} CURRENTPAGE ${currentPage} CURRENT INDEX ${currentIndex}");
+            // WidgetsBinding.instance?.addPostFrameCallback((_) {
+            //   scrollToPosition(0);
+            // });
           },
           itemBuilder: (BuildContext context, index) {
             return DraggableBottomSheet(
               // collapsed: true,
+              // barrierColor: th,
               backgroundWidget: Scaffold(
+                backgroundColor: Theme.of(context).colorScheme.background,
                 body: CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    // SliverAppBar(
-                    //   pinned: true,
-                    //   backgroundColor: const Color.fromRGBO(63, 81, 181, 1),
-                    //   foregroundColor: Colors.white,
-                    //   titleSpacing: -5,
-                    //   title: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Text(
-                    //         "${widget.nomLivre} ${widget.toko} : $currentPage ",
-                    //         style: const TextStyle(fontSize: 18),
-                    //       ),
-                    //       Row(
-                    //         children: [
-                    //           GestureDetector(
-                    //             onTap: () {
-                    //               // Navigate to the home screen
-                    //               Navigator.of(context)
-                    //                   .popUntil((route) => route.isFirst);
-                    //             },
-                    //             child: const Padding(
-                    //               padding: EdgeInsets.only(right: 20),
-                    //               child: Icon(Icons.home),
-                    //             ),
-                    //           ),
-                    //           _buildPopupMenuButton(),
-                    //         ],
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
                     SliverAppBar(
                       pinned: true,
                       automaticallyImplyLeading: false,
-                      title: Container(
+                      expandedHeight: soramandry.isNotEmpty ? 90 : 0,
+                      flexibleSpace: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
                           child: RichText(
-                        text: TextSpan(
-                          text: soramandry,
-                          style: TextStyle(
-                            color: Colors.grey[800],
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      )),
+                            text: TextSpan(
+                              text: soramandry,
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontStyle: FontStyle.italic,
+                                fontSize: zoomLevel + 16,
+                              ),
+                            ),
+                          )),
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -208,49 +230,106 @@ class _SHowVerseState extends State<SHowVerse> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 8, horizontal: 10),
-                            // child: GestureZoomBox(
-                            //   maxScale: 5.0,
-                            //   doubleTapScale: 2.0,
-                            child: InkWell(
-                                overlayColor:
-                                    const MaterialStatePropertyAll(Colors.red),
-                                hoverColor: Colors.red,
-                                // textColor: Colors.grey[700],
-                                // padding: const EdgeInsets.symmetric(horizontal: 0),
-                                // onPressed: () {
-                                //   print(index);
-                                // },
-                                child: RichText(
-                                  softWrap: true,
-                                  textAlign: TextAlign.justify,
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                        color: Color.fromARGB(255, 46, 46, 46)),
-                                    children: [
-                                      TextSpan(
-                                        text: "${index + 1}",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.blue),
+                            child: FocusedMenuHolder(
+                                onPressed: () {
+                                  setState(() {
+                                    pressedAndininy = (index + 1).toString();
+                                  });
+                                  print(pressedAndininy);
+                                },
+                                blurBackgroundColor:
+                                    const Color.fromARGB(75, 78, 78, 78),
+                                animateMenuItems: true,
+                                menuItems: [
+                                  FocusedMenuItem(
+                                      title: Text(
+                                        "${titleLivre} ${currentPage} : ${index + 1}",
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                      const TextSpan(text: "   "),
-                                      TextSpan(
-                                        text: "${andininyTexts[index]}",
-                                        style: const TextStyle(height: 1.5),
-                                      )
-                                    ],
+                                      // trailingIcon: const Icon(Icons.copy),
+
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  FocusedMenuItem(
+                                    title: const Text("Copier"),
+                                    trailingIcon: const Icon(Icons.copy),
+                                    onPressed: () {
+                                      final data = ClipboardData(
+                                          text:
+                                              andininyTexts[index].toString());
+                                      Clipboard.setData(data);
+                                      print(Clipboard.getData("text/plain"));
+
+                                      showSnack(context);
+                                    },
+                                  ),
+                                  FocusedMenuItem(
+                                      title: const Text("Partager"),
+                                      trailingIcon: const Icon(Icons.share),
+                                      onPressed: () {
+                                        print("yes");
+                                      }),
+                                  FocusedMenuItem(
+                                      title: const Text("Enregistrer"),
+                                      trailingIcon: const Icon(Icons.save),
+                                      onPressed: () {
+                                        print("yes");
+                                      }),
+                                  FocusedMenuItem(
+                                    title: const Text(
+                                      "Marquer",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    trailingIcon: const Icon(
+                                      Icons.mark_as_unread,
+                                      color: Colors.black,
+                                    ),
+                                    onPressed: () {
+                                      print("yes");
+                                    },
+                                  ),
+                                ],
+                                openWithTap: false,
+                                child: InkWell(
+                                  onTap: () {},
+                                  // onLongPress: () {
+                                  //   setState(() {
+                                  //     pressedAndininy = (index + 1).toString();
+                                  //   });
+                                  //   print(pressedAndininy);
+                                  // },
+                                  child: RichText(
+                                    softWrap: true,
+                                    textAlign: TextAlign.justify,
+                                    text: TextSpan(
+                                      style: const TextStyle(
+                                          color:
+                                              Color.fromARGB(255, 46, 46, 46)),
+                                      children: [
+                                        TextSpan(
+                                          text: "${index + 1}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: zoomLevel + 16.0,
+                                              color: Colors.blue),
+                                        ),
+                                        const TextSpan(text: "   "),
+                                        TextSpan(
+                                          text: "${andininyTexts[index]}",
+                                          style: TextStyle(
+                                              height: 1.5,
+                                              fontSize: zoomLevel + 14.0),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 )),
-                            // )
                           );
                         },
                         childCount: andininyTexts.length,
                       ),
                     ),
-                    // SliverToBoxAdapter(
-                    //   child:
-                    // ),
                   ],
                 ),
               ),
@@ -292,7 +371,11 @@ class _SHowVerseState extends State<SHowVerse> {
           ),
           const PopupMenuItem<int>(
             value: 2,
-            child: Text('Action 2'),
+            child: Text('Verset enregistré'),
+          ),
+          const PopupMenuItem<int>(
+            value: 2,
+            child: Text('Verset marqué'),
           ),
           // Add more PopupMenuItems as needed
         ];
@@ -355,9 +438,11 @@ class _SHowVerseState extends State<SHowVerse> {
               Switch(
                 value: isLightMode,
                 onChanged: (value) {
+                  Provider.of<ThemeProvider>(context, listen: false)
+                      .toggleTheme();
                   setState(() {
                     isLightMode = value;
-                    // Appliquez le thème ici en fonction de la valeur de l'interrupteur
+                    themBg = Colors.black;
                   });
                 },
                 activeColor: Colors.blue, // Couleur quand le thème est activé
@@ -377,6 +462,7 @@ class _SHowVerseState extends State<SHowVerse> {
           ),
           const SizedBox(height: 16),
           Slider(
+            activeColor: Colors.blue,
             value: zoomLevel,
             onChanged: (value) {
               setState(() {
@@ -385,7 +471,7 @@ class _SHowVerseState extends State<SHowVerse> {
               });
             },
             min: 1.0,
-            max: 3.0,
+            max: 5.0,
             divisions: 20,
             label: '$zoomLevel',
           ),
@@ -410,5 +496,13 @@ class _SHowVerseState extends State<SHowVerse> {
         ],
       ),
     );
+  }
+
+  void showSnack(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Theme.of(context).primaryColor,
+      content: Text("Copied"),
+      duration: Duration(milliseconds: 3000),
+    ));
   }
 }

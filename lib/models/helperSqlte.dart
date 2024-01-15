@@ -48,6 +48,19 @@ class DBHelper {
     });
   }
 
+  static Future<String> getNomLivre(String code) async {
+    final db = await getDB();
+
+    List<Map<String, Object?>> nomLivres = await db.rawQuery('''
+      SELECT name
+      FROM livres_info
+      WHERE code = ?
+    ''', [code]);
+
+    print("NOM EXACTE ${nomLivres.first["name"]}");
+    return nomLivres.first["name"].toString();
+  }
+
   static Future<List<String>> getAndininyTexts(int toko) async {
     try {
       final db = await getDB();
@@ -59,7 +72,7 @@ class DBHelper {
     ''', [toko]);
 
       await db.close();
-      print(result);
+      // print(result);
       // Extract andininy texts from the result
       List<String> andininyTexts =
           result.map((row) => row['text'] as String).toList();
@@ -209,6 +222,112 @@ class DBHelper {
     } catch (e) {
       print("Error fetching andininy count for toko: $e");
       return 0;
+    }
+  }
+
+  static Future<int> getCountForBook(String nomLivre) async {
+    try {
+      final db = await getDB();
+
+      int livreId = Sqflite.firstIntValue(await db.rawQuery('''
+      SELECT id
+      FROM books
+      WHERE shortName = ?
+    ''', [nomLivre])) ?? 0;
+
+      List<Map<String, Object?>> result = await db.rawQuery('''
+      SELECT COUNT(*) as count
+      FROM tokos
+      WHERE book_id = ?
+    ''', [livreId]);
+
+      await db.close();
+
+      int count = result.first['count'] as int;
+
+      print("Livre ID: $livreId");
+      print("Nombre de Tokos: $count");
+
+      return count;
+    } catch (e) {
+      print("Error fetching Toko count for book: $e");
+      return 0;
+    }
+  }
+
+  static Future<String?> getNextBook(String nomLivre) async {
+    try {
+      final db = await getDB();
+
+      // Récupérer l'ID du livre actuel
+      int currentBookId = Sqflite.firstIntValue(await db.rawQuery('''
+      SELECT id
+      FROM books
+      WHERE shortName = ?
+    ''', [nomLivre])) ?? 0;
+
+      // Récupérer le nom du livre suivant
+      List<Map<String, Object?>> result = await db.rawQuery('''
+      SELECT shortName
+      FROM books
+      WHERE id > ?
+      ORDER BY id ASC
+      LIMIT 1
+    ''', [currentBookId]);
+
+      await db.close();
+
+      // Vérifier si le résultat est vide
+      if (result.isNotEmpty) {
+        String? nextBook = result.first['shortName'] as String?;
+        print("Nom du livre suivant: $nextBook");
+        return nextBook;
+      } else {
+        // Aucun livre suivant trouvé
+        print("Aucun livre suivant trouvé.");
+        return null;
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération du livre suivant: $e");
+      return null;
+    }
+  }
+
+  static Future<String?> getPreviousBook(String nomLivre) async {
+    try {
+      final db = await getDB();
+
+      // Récupérer l'ID du livre actuel
+      int currentBookId = Sqflite.firstIntValue(await db.rawQuery('''
+      SELECT id
+      FROM books
+      WHERE shortName = ?
+    ''', [nomLivre])) ?? 0;
+
+      // Récupérer le nom du livre précédent
+      List<Map<String, Object?>> result = await db.rawQuery('''
+      SELECT shortName
+      FROM books
+      WHERE id < ?
+      ORDER BY id DESC
+      LIMIT 1
+    ''', [currentBookId]);
+
+      await db.close();
+
+      // Vérifier si le résultat est vide
+      if (result.isNotEmpty) {
+        String? previousBook = result.first['shortName'] as String?;
+        print("Nom du livre précédent: $previousBook");
+        return previousBook;
+      } else {
+        // Aucun livre précédent trouvé
+        print("Aucun livre précédent trouvé.");
+        return null;
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération du livre précédent: $e");
+      return null;
     }
   }
 }

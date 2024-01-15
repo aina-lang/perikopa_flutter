@@ -6,6 +6,7 @@ import 'package:perikopa_flutter/models/helperSqlte.dart';
 import 'package:perikopa_flutter/pages/AllBookScreen.dart';
 import 'package:perikopa_flutter/pages/AproposScreen.dart';
 import 'package:perikopa_flutter/pages/HomeScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Index extends StatefulWidget {
   const Index({super.key});
@@ -21,6 +22,8 @@ class _IndexState extends State<Index> {
   void printToko() async {
     // List toko=DBHelper.getTokoValue(widget, numero)
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,7 @@ class _IndexState extends State<Index> {
               MaterialPageRoute(
                   builder: (BuildContext context) => AllBookScreen()));
         },
-        backgroundColor: Color.fromRGBO(63, 81, 181, 1),
+        backgroundColor:  Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         shape: CircleBorder(),
         child: Icon(Icons.menu_book_sharp),
@@ -46,7 +49,7 @@ class _IndexState extends State<Index> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         height: 70,
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Theme.of(context).colorScheme.background,
         shape: CircularNotchedRectangle(),
         shadowColor: Colors.grey,
         notchMargin: 10,
@@ -85,7 +88,7 @@ class _IndexState extends State<Index> {
                         });
                       },
                       textColor: _currentIndex == 1
-                          ? Color.fromRGBO(63, 81, 181, 1)
+                          ?  Theme.of(context).colorScheme.primary
                           : Colors.grey,
                       child:
                           Column(children: [Icon(Icons.info), Text("Apropos")]),

@@ -14,7 +14,8 @@ class FilledButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromRGBO(63, 81, 181, 1), // Couleur de fond du bouton
+        backgroundColor:
+            Color.fromRGBO(63, 81, 181, 1), // Couleur de fond du bouton
         elevation: 0, // Supprimer l'élévation pour un aspect plat
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
@@ -44,14 +45,14 @@ class _SearchSection extends State<SearchSection> {
         height: 45,
         width: screenWidth - 30,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.background,
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 2), // changes position of shadow
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -61,25 +62,21 @@ class _SearchSection extends State<SearchSection> {
               child: TextField(
                 autocorrect: true,
                 autofocus: false,
-                style: TextStyle(color: Colors.black,fontSize: 15),
+                style: TextStyle(color: Colors.black, fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'Rechercher des versets',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.grey),
-                  contentPadding: EdgeInsets.only(left:10)
-                ),
+                    hintText: 'Rechercher des versets',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.grey),
+                    contentPadding: EdgeInsets.only(left: 10)),
               ),
             ),
             SizedBox(width: 8.0),
-            FilledButton(
-              onPressed: () {
-                // Logique à exécuter lors du clic sur le bouton
-              },
-              child: Row(
-                children: const [
-                  Icon(Icons.search, color: Colors.white),
-                ],
-              ),
+            MaterialButton(
+              // padding: EdgeInsets.symmetric(vertical: 0,horizontal: 0),
+              // color: Theme.of(context).colorScheme.primary,
+              onPressed: () {},
+              child: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
+             
             ),
           ],
         ),

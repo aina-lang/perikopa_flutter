@@ -17,7 +17,9 @@ class AndininyScreen extends StatefulWidget {
 class _AndininyScreenState extends State<AndininyScreen> {
   int? andininyCount ;
 
-  int selectedButtonIndex = 0; // Track the selected button index
+  int selectedButtonIndex = 0;
+  
+  late String titleLivre=""; // Track the selected button index
 
   @override
   void initState() {
@@ -28,7 +30,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
   Future<void> fetchandininyCount(String nomLivre) async {
     int distinctAndinnyValues = await DBHelper.getAndininyCountForToko(
         widget.nomLivre, widget.toko);
-
+titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
     setState(() {
       andininyCount = distinctAndinnyValues;
     });
@@ -44,14 +46,14 @@ class _AndininyScreenState extends State<AndininyScreen> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            backgroundColor: Color.fromRGBO(63, 81, 181, 1),
+            backgroundColor:  Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
             titleSpacing: -5,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${widget.nomLivre} ${widget.toko}",
+                  "${titleLivre} ${widget.toko}",
                   style: TextStyle(fontSize: 18),
                 ),
                 GestureDetector(
@@ -106,7 +108,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Color.fromRGBO(63, 81, 181, 1)
+                            ?  Theme.of(context).colorScheme.primary
                             : Colors.white,
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
@@ -124,7 +126,7 @@ class _AndininyScreenState extends State<AndininyScreen> {
                           style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : Color.fromRGBO(63, 81, 181, 1)),
+                                  :  Theme.of(context).colorScheme.primary),
                         ),
                       ),
                     ),

@@ -22,6 +22,7 @@ class _HomeVerseState extends State<HomeVerse> {
   @override
   Widget build(BuildContext context) {
     return Row(
+    
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

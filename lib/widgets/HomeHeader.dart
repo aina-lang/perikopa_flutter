@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:perikopa_flutter/config/AppStyle.dart';
+import 'package:perikopa_flutter/config/ThemeProvider.dart';
 import 'package:perikopa_flutter/widgets/SearchSection.dart';
+import 'package:provider/provider.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({Key? key}) : super(key: key);
@@ -21,47 +24,58 @@ class _HomeHeaderState extends State<HomeHeader> {
           Container(
             height: screenHeight / 3 + 400,
             width: screenWidth,
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: Theme.of(context).colorScheme.background,
           ),
 
           Container(
             height: screenHeight / 3,
             width: screenWidth,
-            color: Color.fromRGBO(63, 81, 181, 1),
-            // child: Image.asset(
-            //   "assets/images/jesus.jpg",
-            //   fit: BoxFit.cover,
-            // ),
+           
+            decoration: BoxDecoration( color: Theme.of(context).colorScheme.primary,),
+            child: Image.asset(
+              "assets/images/jesus.jpg",
+              fit: BoxFit.cover,
+            ),
           ),
 
           Positioned(
-            bottom: -20,
-            right: -100,
-            width: 280,
-            child: Image.asset('assets/images/Regular_blob.png'),
+            bottom: -30,
+            right: -150,
+            width: 350,
+            // height: 500,
+            child: Image.asset('assets/images/Regular_blob.png', fit: BoxFit.cover,),
           ),
 
-          const Positioned(
+          Positioned(
+              top: 20,
+              right: -100,
+              width: 280,
+              child: Switch(
+                  trackOutlineWidth: MaterialStatePropertyAll(0),
+                  value: false,
+                  onChanged: (value) {
+                    Provider.of<ThemeProvider>(context, listen: false)
+                        .toggleTheme();
+                  })),
+           Positioned(
             top: 50.0, // Position du titre
             left: 20.0,
             child: Text(
               "Perikopa",
               style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                shadows: [
-                  Shadow()
-                ]
-                // decoration:
-              ),
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.background,
+                  shadows: [Shadow()]
+                  // decoration:
+                  ),
             ),
           ),
           Positioned(
             top: 90,
             left: 20.0,
             child: SizedBox(
-              width: screenWidth - 40.0, // Largeur du texte
+              width: screenWidth - 40.0,
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -77,7 +91,8 @@ class _HomeHeaderState extends State<HomeHeader> {
             ),
           ),
 
-          Positioned(bottom: 10, width: screenWidth, child: const SearchSection())
+          Positioned(
+              bottom: 10, width: screenWidth, child: const SearchSection())
         ],
       ),
     );
