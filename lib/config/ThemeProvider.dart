@@ -1,8 +1,12 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import "package:flutter/material.dart";
 import "package:perikopa_flutter/config/AppStyle.dart";
 
 class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = AppStyle.lightTheme;
+  ThemeData _themeData = Preference().getTheme() == false
+      ? AppStyle.lightTheme
+      : AppStyle.darkTheme;
   ThemeData get themeData => _themeData;
 
   set themeData(ThemeData themeData) {
