@@ -5,7 +5,10 @@ import 'package:perikopa_flutter/widgets/SearchSection.dart';
 import 'package:provider/provider.dart';
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({Key? key}) : super(key: key);
+  final String faneva;
+  final int taona;
+  const HomeHeader({Key? key, required this.faneva, required this.taona})
+      : super(key: key);
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -74,12 +77,12 @@ class _HomeHeaderState extends State<HomeHeader> {
             top: 50.0, // Position du titre
             left: 20.0,
             child: Text(
-              "Perikopa",
+              "Perikopa ${widget.taona}",
               style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.background,
-                  shadows: [Shadow()]
+                  shadows: const [Shadow()]
                   // decoration:
                   ),
             ),
@@ -89,14 +92,14 @@ class _HomeHeaderState extends State<HomeHeader> {
             left: 20.0,
             child: SizedBox(
               width: screenWidth - 40.0,
-              child: const Column(
+              child:  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle. - Jean 3:16",
+                    widget.faneva,
                     style: TextStyle(
                       fontSize: 15.0,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                     ),
                   )
                 ],

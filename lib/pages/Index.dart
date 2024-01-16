@@ -1,12 +1,9 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, file_names, prefer_const_literals_to_create_immutables, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:perikopa_flutter/models/Book.dart';
-import 'package:perikopa_flutter/models/helperSqlte.dart';
 import 'package:perikopa_flutter/pages/AllBookScreen.dart';
 import 'package:perikopa_flutter/pages/AproposScreen.dart';
 import 'package:perikopa_flutter/pages/HomeScreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Index extends StatefulWidget {
   const Index({super.key});

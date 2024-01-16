@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:focused_menu_custom/focused_menu.dart';
 import 'package:focused_menu_custom/modals.dart';
-import 'package:gesture_zoom_box/gesture_zoom_box.dart';
 import 'package:perikopa_flutter/config/AppStyle.dart';
 import 'package:perikopa_flutter/config/ThemeProvider.dart';
 import 'package:perikopa_flutter/models/helperSqlte.dart';
@@ -41,6 +40,7 @@ class _SHowVerseState extends State<SHowVerse> {
   late int itemCount = 0;
   late String pressedAndininy = "";
   late String Code = "";
+  late SwiperController swiperController;
   @override
   void initState() {
     super.initState();
@@ -49,7 +49,7 @@ class _SHowVerseState extends State<SHowVerse> {
     currentPage = tokoAsInt;
     currentIndex = 0;
     Code = widget.nomLivre;
-
+    swiperController = SwiperController();
     fetchAndininyText(widget.nomLivre);
   }
 
@@ -79,7 +79,7 @@ class _SHowVerseState extends State<SHowVerse> {
     titleLivre = await DBHelper.getNomLivre(nom);
     if (currentPage < itemCount + 1) {
       print(
-          "1 BOKY ${titleLivre} TOTAL TOKO :${itemCount} CURRENT INDEX :${currentIndex}");
+          "1 BOKY $titleLivre TOTAL TOKO :$itemCount CURRENT INDEX :$currentIndex");
       List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
 
       setState(() {
@@ -87,6 +87,22 @@ class _SHowVerseState extends State<SHowVerse> {
         andininyTexts = andininyResult
             .map((text) => _filterTextBetweenBrackets(text))
             .toList();
+      });
+    } else if (currentPage < 1) {
+      currentPage = 1;
+      String? nomLivre = await DBHelper.getPreviousBook(nom);
+      int tokoId = await DBHelper.getTokoValue(nomLivre!, currentPage);
+      List<String> andininyResult = await DBHelper.getAndininyTexts(tokoId);
+      soramandry = extractTextBetweenBrackets(andininyResult.first);
+      titleLivre = await DBHelper.getNomLivre(nomLivre);
+      itemCount = await DBHelper.getCountForBook(nomLivre);
+      print(
+          "3 BOKY $titleLivre TOTAL TOKO :$itemCount CURRENT INDEX :$currentIndex");
+      setState(() {
+        andininyTexts = andininyResult
+            .map((text) => _filterTextBetweenBrackets(text))
+            .toList();
+        Code = nomLivre;
       });
     } else {
       // currentIndex = 0;
@@ -98,7 +114,7 @@ class _SHowVerseState extends State<SHowVerse> {
       titleLivre = await DBHelper.getNomLivre(nomLivre);
       itemCount = await DBHelper.getCountForBook(nomLivre);
       print(
-          "2 BOKY ${titleLivre} TOTAL TOKO :${itemCount} CURRENT INDEX :${currentIndex}");
+          "2 BOKY $titleLivre TOTAL TOKO :$itemCount CURRENT INDEX :$currentIndex");
       setState(() {
         andininyTexts = andininyResult
             .map((text) => _filterTextBetweenBrackets(text))
@@ -110,7 +126,7 @@ class _SHowVerseState extends State<SHowVerse> {
     _scrollController = ScrollController();
 
     // print(int.parse(widget.andininy));
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToPosition(int.parse(widget.andininy));
     });
   }
@@ -158,7 +174,7 @@ class _SHowVerseState extends State<SHowVerse> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${titleLivre} $currentPage ",
+              "$titleLivre $currentPage ",
               style: const TextStyle(fontSize: 18),
             ),
             Row(
@@ -184,10 +200,11 @@ class _SHowVerseState extends State<SHowVerse> {
           // index: 0,
           onIndexChanged: (index) {
             print(
-                "INDEX ${index} CURRENTPAGE ${currentPage} CURRENT INDEX ${currentIndex}");
+                "INDEX $index CURRENTPAGE $currentPage CURRENT INDEX $currentIndex");
             setState(() {
               if (index == currentIndex + 1) {
                 currentPage = (currentPage + 1);
+                //  swiperController.previous();
               } else if (index != currentIndex + 1) {
                 currentPage = (currentPage - 1);
               }
@@ -195,7 +212,7 @@ class _SHowVerseState extends State<SHowVerse> {
             });
             fetchAndininyText(Code);
             print(
-                "INDEX ${index} CURRENTPAGE ${currentPage} CURRENT INDEX ${currentIndex}");
+                "INDEX $index CURRENTPAGE $currentPage CURRENT INDEX $currentIndex");
             // WidgetsBinding.instance?.addPostFrameCallback((_) {
             //   scrollToPosition(0);
             // });
@@ -214,7 +231,7 @@ class _SHowVerseState extends State<SHowVerse> {
                       automaticallyImplyLeading: false,
                       expandedHeight: soramandry.isNotEmpty ? 90 : 0,
                       flexibleSpace: Padding(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10),
                           child: RichText(
                             text: TextSpan(
@@ -246,8 +263,8 @@ class _SHowVerseState extends State<SHowVerse> {
                                 menuItems: [
                                   FocusedMenuItem(
                                       title: Text(
-                                        "${titleLivre} ${currentPage} : ${index + 1}",
-                                        style: TextStyle(color: Colors.white),
+                                        "$titleLivre $currentPage : ${index + 1}",
+                                        style: const TextStyle(color: Colors.white),
                                       ),
                                       // trailingIcon: const Icon(Icons.copy),
 
@@ -504,8 +521,8 @@ class _SHowVerseState extends State<SHowVerse> {
   void showSnack(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: Theme.of(context).primaryColor,
-      content: Text("Copied"),
-      duration: Duration(milliseconds: 3000),
+      content: const Text("Copied"),
+      duration: const Duration(milliseconds: 3000),
     ));
   }
 }

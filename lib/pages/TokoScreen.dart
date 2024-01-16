@@ -109,7 +109,7 @@ class _TokoScreenState extends State<TokoScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0x9f9a9a).withOpacity(0.26),
+                            color: const Color(0x009f9a9a).withOpacity(0.26),
                             offset: const Offset(0, 2),
                             blurRadius: 2,
                             spreadRadius: 1,

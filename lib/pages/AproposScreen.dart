@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:perikopa_flutter/config/Update.dart';
+import 'package:perikopa_flutter/widgets/CustomHeader.dart';
 
 class AproposScreen extends StatefulWidget {
   const AproposScreen({Key? key}) : super(key: key);
@@ -9,6 +12,17 @@ class AproposScreen extends StatefulWidget {
 
 class _AproposScreenState extends State<AproposScreen> {
   final int currentYear = DateTime.now().year;
+
+  late double percentage;
+
+  late bool isDownloading;
+
+  @override
+  void initState() {
+    percentage = 0.0;
+    isDownloading = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     // double screenHeight = MediaQuery.of(context).size.height;
@@ -16,30 +30,7 @@ class _AproposScreenState extends State<AproposScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.4,
-            pinned: true,
-            stretch: true,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.all(0),
-              stretchModes: const [StretchMode.zoomBackground],
-              title: Container(
-                padding: const EdgeInsets.only(left: 20, top: 15),
-                height: 56,
-                width: screenWidth,
-                // color: Colors.white,
-                child: const Text(
-                  'À propos de l\'application',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-              background: Image.asset(
-                'assets/images/adult.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+         const CustomHeader(),
           SliverList(
             delegate: SliverChildListDelegate(
               [
@@ -49,40 +40,41 @@ class _AproposScreenState extends State<AproposScreen> {
                     borderRadius: BorderRadius.circular(20),
                     // color: Colors.amber
                   ),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 20.0),
-                      Text(
+                      const SizedBox(height: 20.0),
+                      const Text(
                         'Perikopa App',
                         style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 18.0),
-                      Text(
+                      const SizedBox(height: 18.0),
+                      const Text(
                         "L'application  s'adresse spécifiquement aux membres de l'Église Apokalipsy, offrant une solution numérique moderne pour la gestion et l'accès aux versets bibliques prévus chaque samedi. Actuellement, la planification des versets pour toute une année est réalisée, et il est nécessaire de numériser ce processus afin d'optimiser l'expérience des utilisateurs au sein de la communauté.",
                         style: TextStyle(
                             fontSize: 14.0,
                             textBaseline: TextBaseline.alphabetic),
                       ),
-                      SizedBox(height: 18.0),
-                      Text(
+                      const SizedBox(height: 18.0),
+                      const Text(
                           "-	Facilite l'accès aux livres, chapitres et versets bibliques, permettant aux utilisateurs de naviguer intuitivement entre toutes les sections des 66 livres de la Bible, et ce, sans se limiter uniquement aux versets du Perikopa."),
-                      SizedBox(height: 18.0),
-                      Text("-	 Listage des verses Perikopa des chaque mois."),
-                      SizedBox(height: 18.0),
-                      Text(
+                      const SizedBox(height: 18.0),
+                      const Text(
+                          "-	 Listage des verses Perikopa des chaque mois."),
+                      const SizedBox(height: 18.0),
+                      const Text(
                           "-	Pouvoir prendre des notes pour enregistrer des annotations spécifiques."),
-                      SizedBox(height: 24.0),
-                      Text(
+                      const SizedBox(height: 24.0),
+                      const Text(
                         'Developpeur & Concepteur:',
                         style: TextStyle(
                             fontSize: 14.0, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8.0),
-                      ListTile(
+                      const SizedBox(height: 8.0),
+                      const ListTile(
                         leading: CircleAvatar(
                           backgroundImage: AssetImage(
                             'assets/images/aina.png',
@@ -108,14 +100,14 @@ class _AproposScreenState extends State<AproposScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 16.0),
-                      Text(
+                      const SizedBox(height: 16.0),
+                      const Text(
                         'UX & UI Designer',
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8.0),
-                      ListTile(
+                      const SizedBox(height: 8.0),
+                      const ListTile(
                         leading: CircleAvatar(
                           backgroundImage:
                               AssetImage('assets/images/lucien.jpg'),
@@ -136,17 +128,51 @@ class _AproposScreenState extends State<AproposScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
+                      Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: ElevatedButton(
+                          onPressed: isDownloading == false &&percentage<1.0
+                              ? () {
+                                  Update()
+                                      .downloadAndSaveFile((double progress) {
+                                    setState(() {
+                                      percentage = percentage + progress;
+                                    });
+                                    // if (percentage < 1.0) {
+                                    //   isDownloading = false;
+                                    // }
+                                  });
+                                }
+                              : null,
+                          child: percentage == 1.0
+                              ? const Text('Telechargement avec succées')
+                              : const Text('Telecharger le mise a jours'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: LinearPercentIndicator(
+                          width: MediaQuery.of(context).size.width - 50,
+                          animation: true,
+                          lineHeight: 20.0,
+                          animationDuration: 2000,
+                          percent: percentage,
+                          center: Text("${percentage * 100}%"),
+                          linearStrokeCap: LinearStrokeCap.roundAll,
+                          progressColor: Colors.greenAccent,
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '© 2024 Perikopa',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            '© $currentYear Perikopa',
+                            style: const TextStyle(fontSize: 16, color: Colors.grey),
                           )
                         ],
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                     ],
                   ),
                 ),

@@ -40,13 +40,32 @@ class _AllBookScreenState extends State<AllBookScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(0.0),
+              child: Container(
+                height: 20,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20))),
+                child: Container(
+                  height: 5,
+                  width: 30,
+                  decoration: const BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                ),
+              ),
+            ),
             pinned: true,
             stretch: true,
             expandedHeight: MediaQuery.of(context).size.height * 0.4,
             // surfaceTintColor: Colors.red,
 
             foregroundColor: Colors.white,
-            backgroundColor:  Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             // title:
             flexibleSpace: FlexibleSpaceBar(
                 titlePadding: const EdgeInsets.all(0),
@@ -74,10 +93,10 @@ class _AllBookScreenState extends State<AllBookScreen> {
             // actions: null,
             pinned: false,
             backgroundColor: Theme.of(context).colorScheme.background,
-            foregroundColor: Color.fromARGB(255, 78, 77, 77),
+            foregroundColor: const Color.fromARGB(255, 78, 77, 77),
             automaticallyImplyLeading: false,
             // forceMaterialTransparency: Color.fromARGB(255, 220, 229, 250),
-            title: SizedBox(
+            title: const SizedBox(
               height: 40,
               // color: Colors.amber,
               child: Text(
@@ -98,9 +117,9 @@ class _AllBookScreenState extends State<AllBookScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       //  boxShadow: [BoxShadow(color: Color.fromARGB(155, 95, 94, 94),blurRadius: 1,offset: Offset(1,1),spreadRadius: 0.5)]
-                          
+
                       color: boutonClique[index]
-                          ?  Theme.of(context).colorScheme.primary
+                          ? Theme.of(context).colorScheme.primary
                           : Colors.white,
                     ),
                     child: FilledButton(
@@ -124,11 +143,12 @@ class _AllBookScreenState extends State<AllBookScreen> {
                       style: ButtonStyle(
                         backgroundColor: boutonClique[index]
                             ? MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.primary)
+                                Theme.of(context).colorScheme.primary)
                             : MaterialStateProperty.all(Colors.white),
                         foregroundColor: boutonClique[index]
                             ? MaterialStateProperty.all(Colors.white)
-                            : MaterialStateProperty.all(Color.fromARGB(255, 146, 147, 148)),
+                            : MaterialStateProperty.all(
+                                const Color.fromARGB(255, 146, 147, 148)),
                         padding: MaterialStateProperty.all(
                           const EdgeInsets.only(
                               top: 15, bottom: 15, left: 20, right: 5),
@@ -138,7 +158,7 @@ class _AllBookScreenState extends State<AllBookScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(book.name ?? ''), // Handle nullable 'shortName'
-                          Icon(Icons.navigate_next_outlined)
+                          const Icon(Icons.navigate_next_outlined)
                         ],
                       ),
                     ),

@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors, avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomeVerse extends StatefulWidget {
   const HomeVerse({Key? key}) : super(key: key);
@@ -18,23 +21,68 @@ class _HomeVerseState extends State<HomeVerse> {
 
   bool isButton3Hovered = false;
   bool isButton3Focused = false;
+  var jsonData;
+
+  @override
+  void initState() {
+    InitDataFromJson();
+  }
+
+  void InitDataFromJson() async {
+    final String response =
+        await rootBundle.loadString('assets/listPerikopa.json');
+    final data = await json.decode(response);
+    setState(() {
+      jsonData = data;
+    });
+  }
+
+  List<Map<String, dynamic>>? getVersetForMonth(String monthName) {
+    // print(jsonData);
+    if (jsonData != null) {
+      var mois = jsonData['mois'];
+      print(mois);
+      for (var moisData in mois) {
+        if (moisData['nom'] == monthName) {
+          var perikopa = moisData['perikopa'];
+
+          if (perikopa != null && perikopa.isNotEmpty) {
+            return perikopa[0]['verset'];
+          }
+        }
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    InitDataFromJson();
+    List<Map<String, dynamic>>? versets = getVersetForMonth("Janvier");
+    // print(versets);
+
     return Row(
-    
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildTextButton("Matio 3:2", 1),
-        _buildTextButton("Matio 3:2", 2),
-        _buildTextButton("Matio 3:2", 3),
-        _buildTextButton("Matio 3:2", 4),
+        if (versets != null)
+          for (int i = 0; i < versets.length; i++)
+            _buildTextButton(
+              versets[i]['shortName'],
+              versets[i]['andininyStart'],
+              versets[i]['andininyEnd'],
+              i + 1,
+            ),
       ],
     );
   }
 
-  Widget _buildTextButton(String text, int buttonNumber) {
+  Widget _buildTextButton(
+    String versetName,
+    int andininyStart,
+    int andininyEnd,
+    int buttonNumber,
+  ) {
     return MouseRegion(
       onEnter: (event) {
         setState(() {
@@ -72,11 +120,33 @@ class _HomeVerseState extends State<HomeVerse> {
         },
         child: TextButton(
           onPressed: () {
-            print("Bouton $buttonNumber cliqué !");
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Verset $versetName'),
+                  content: Text(
+                    "$versetName ${andininyStart}-${andininyEnd}",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Fermer'),
+                    ),
+                  ],
+                );
+              },
+            );
           },
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all(
-              (isButton1Hovered || isButton1Focused)
+              (buttonNumber == 1 && (isButton1Hovered || isButton1Focused)) ||
+                      (buttonNumber == 2 &&
+                          (isButton2Hovered || isButton2Focused)) ||
+                      (buttonNumber == 3 &&
+                          (isButton3Hovered || isButton3Focused))
                   ? Color.fromRGBO(63, 81, 181, 1)
                   : Color.fromARGB(221, 45, 43, 43),
             ),
@@ -89,12 +159,12 @@ class _HomeVerseState extends State<HomeVerse> {
                     states.contains(MaterialState.pressed)) {
                   return Color.fromRGBO(63, 81, 181, 1).withOpacity(0.12);
                 }
-                return null; // Defer to the widget's default.
+                return null;
               },
             ),
           ),
           child: Text(
-            text,
+            versetName,
             style: TextStyle(
               fontSize: 14.0,
               color: Color.fromARGB(221, 80, 75, 78),

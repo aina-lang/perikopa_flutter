@@ -116,7 +116,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Container(
                 height: 5,
                 width: 150,
-                color: Color.fromRGBO(63, 81, 181, 1),
+                color: const Color.fromRGBO(63, 81, 181, 1),
               ),
             ),
             const SizedBox(height: 20),

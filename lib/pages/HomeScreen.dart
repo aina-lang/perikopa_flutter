@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:perikopa_flutter/models/MonthInfo.dart';
-import 'package:perikopa_flutter/pages/Index.dart';
+import 'package:perikopa_flutter/pages/OneMonthScreen.dart';
 import 'package:perikopa_flutter/widgets/HomeHeader.dart';
 import 'package:perikopa_flutter/widgets/HomeVerse.dart';
 
@@ -16,71 +19,32 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PageStorageBucket bucket = PageStorageBucket();
-  final List<MonthInfo> months = [
-    MonthInfo(
-      name: 'Janvier',
-      description: 'Ceci est janvier. C\'est le premier mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Février',
-      description: 'Ceci est février. C\'est le deuxième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Mars',
-      description: 'Ceci est mars. C\'est le troisième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Avril',
-      description: 'Ceci est avril. C\'est le quatrième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Mai',
-      description: 'Ceci est mai. C\'est le cinquième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Juin',
-      description: 'Ceci est juin. C\'est le sixième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Juillet',
-      description: 'Ceci est juillet. C\'est le septième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Août',
-      description: 'Ceci est août. C\'est le huitième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Septembre',
-      description: 'Ceci est septembre. C\'est le neuvième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Octobre',
-      description: 'Ceci est octobre. C\'est le dixième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Novembre',
-      description: 'Ceci est novembre. C\'est le onzième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-    MonthInfo(
-      name: 'Décembre',
-      description: 'Ceci est décembre. C\'est le douzième mois de l\'année.',
-      imageUrl: 'assets/images/adult.jpg',
-    ),
-  ];
+
+  var jsonData;
+
+  @override
+  void initState() {
+    InitDataFromJson();
+  }
+
+  void InitDataFromJson() async {
+    final String response =
+        await rootBundle.loadString('assets/listPerikopa.json');
+    final data = await json.decode(response);
+    setState(() {
+      jsonData = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    DataModel dataModel = DataModel.fromJson(jsonData);
+    List<Month> allMonths = [
+      ...dataModel.tronche1.mois,
+      ...dataModel.tronche2.mois
+    ];
+    print(dataModel);
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: CustomScrollView(
@@ -90,7 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: HomeHeader(),
+              background: HomeHeader(
+                faneva: dataModel.tenyFaneva,
+                taona: dataModel.taona,
+              ),
             ),
           ),
           SliverList(
@@ -98,21 +65,32 @@ class _HomeScreenState extends State<HomeScreen> {
               [
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20),
-                  // color: Theme.of(context).colorScheme.background,
-                  // decoration: BoxDecoration(color: Color.fromARGB(255, 235, 239, 241)),
                   child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(left: 20, bottom: 5),
-                          child: Text(
-                            "Ity herinandro ity",
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding:
+                            EdgeInsets.only(left: 20, bottom: 5, right: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Ity herinandro ity",
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                            // Utilisez la date du premier mois
+                            Text(
+                              "05 - 26 ${allMonths[0].nom}  ${dataModel.taona}",
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          ],
                         ),
-                        HomeVerse()
-                      ]),
+                      ),
+                      HomeVerse(),
+                    ],
+                  ),
                 ),
                 CarouselSlider(
                   options: CarouselOptions(
@@ -120,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     enlargeCenterPage: true,
                     autoPlay: true,
                   ),
-                  items: months.map((MonthInfo month) {
+                  items: allMonths.map((Month month) {
                     return Builder(
                       builder: (BuildContext context) {
                         return InkWell(
@@ -128,17 +106,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => NoteScreen(),
+                                builder: (context) => OneMonthScreen(
+                                  monthName: month.nom,
+                                  faneva: month.faneva,
+                                  // month
+                                ),
                               ),
                             );
                           },
                           child: Container(
-                            // padding: EdgeInsets.symmetric(vertical: 10),
                             width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 10),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 5.0, vertical: 10),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              boxShadow: [BoxShadow(color: Color.fromARGB(192, 95, 94, 94),blurRadius: 2,offset: Offset(1,1),spreadRadius: 0.5)]
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color.fromARGB(192, 95, 94, 94),
+                                  blurRadius: 2,
+                                  offset: Offset(1, 1),
+                                  spreadRadius: 0.5,
+                                ),
+                              ],
                             ),
                             child: Stack(
                               alignment: Alignment.center,
@@ -148,7 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: double.infinity,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(month.imageUrl),
+                                      image:
+                                          AssetImage("assets/images/adult.jpg"),
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
@@ -166,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      month.name,
+                                      month.nom,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 24.0,
@@ -175,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     SizedBox(height: 16.0),
                                     Text(
-                                      month.description,
+                                      month.faneva,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 14.0,

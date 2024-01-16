@@ -53,15 +53,15 @@ titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${titleLivre} ${widget.toko}",
-                  style: TextStyle(fontSize: 18),
+                  "$titleLivre ${widget.toko}",
+                  style: const TextStyle(fontSize: 18),
                 ),
                 GestureDetector(
                   onTap: () {
                     // Navigate to the home screen
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   },
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.only(right: 20),
                     child: Icon(Icons.home),
                   ),
@@ -69,7 +69,7 @@ titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
               ],
             ),
           ),
-          SliverAppBar(
+          const SliverAppBar(
             automaticallyImplyLeading: false,
             title: Text(
               "SAFIDIO NY Andininy",
@@ -80,7 +80,7 @@ titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
             titleSpacing: 10,
           ),
           SliverPadding(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
@@ -113,8 +113,8 @@ titleLivre = await DBHelper.getNomLivre(widget.nomLivre);
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0x9f9a9a).withOpacity(0.26),
-                            offset: Offset(0, 2),
+                            color: const Color(0x009f9a9a).withOpacity(0.26),
+                            offset: const Offset(0, 2),
                             blurRadius: 2,
                             spreadRadius: 1,
                           )
